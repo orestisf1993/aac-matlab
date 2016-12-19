@@ -33,9 +33,9 @@ switch frameType
         end
     case 'LSS'
         % A long window on the left and a short on the right.
-        window = [longWindow(1:1024,:); ones(448, 2); shortWindow(1:128,:); ones(448, 2)];
+        window = [longWindow(1:1024,:); ones(448, 2); shortWindow(129:256,:); zeros(448, 2)];
     case 'LPS'
-        window = [ones(448, 2); shortWindow(1:128,:); ones(448, 2); longWindow(1:1024,:)];
+        window = [zeros(448, 2); shortWindow(1:128,:); ones(448, 2); longWindow(1025:2048,:)];
 end
 if ~exist('frameF', 'var')
     frameT = frameT .* window;
