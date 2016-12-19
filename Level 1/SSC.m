@@ -12,8 +12,8 @@ function frameType = SSC(frameT, nextFrameT, prevFrameType)
 %% Check input validity.
 % Check prevFrameType in acceptable values.
 assertIsFrameType(prevFrameType, 'invalid prevFrameType');
-assert(all(size(frameT) == [2048, 2]), 'invalid frameT size');
-assert(all(size(nextFrameT) == [2048, 2]), 'invalid nextFrameT size');
+assertIsFullFrame(frameT, 'invalid frameT size');
+assertIsFullFrame(nextFrameT, 'invalid frameT size');
 
 %% Instantly return result for ESH, LPS.
 if strcmp(prevFrameType, 'LSS')
@@ -77,7 +77,7 @@ switch previousType
             frameType = 'LPS';
         end
     otherwise
-        assert(false, 'Code should not reach this point.');
+        error('Code should not reach this point.');
 end
 end
 
