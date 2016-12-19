@@ -39,7 +39,6 @@ for frameIdx = 0:numberOfFrames - 1
     nextFrameT = sliceFrame(input, frameIdx+1, frameWidth, overlap);
 
     prevType = SSC(frameT, nextFrameT, prevType);
-    %     display(prevType); %TODO:del
     AACSeq1(frameIdx+1).frameType = prevType;
     AACSeq1(frameIdx+1).winType = winType;
     frameF = filterbank(frameT, prevType, winType);
@@ -54,5 +53,5 @@ function frameT = sliceFrame(array, idx, frameWidth, overlap)
 frameStart = idx * frameWidth * overlap + 1;
 frameEnd = frameStart + frameWidth - 1;
 frameRange = frameStart:frameEnd;
-frameT = array(frameRange, :);
+frameT = array(frameRange,:);
 end

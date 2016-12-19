@@ -17,8 +17,8 @@ input = audioread(fNameIn);
 % output = audioread(fNameOut);
 
 common_length = min(length(input), length(output));
-input = input(1:common_length, :);
-output = output(1:common_length, :);
+input = input(1:common_length,:);
+output = output(1:common_length,:);
 noise = input - output;
 
 SNR = snr(input, noise);

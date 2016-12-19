@@ -24,11 +24,12 @@ switch frameType
         frameF = zeros(1024, 2);
         % Split in 8 regions with 50% overlap.
         for idx = 0:7
-            rangeF = idx * 128 + 1:(idx + 1) * 128;
-            rangeT = 448 + idx * 128 + 1:448 + (idx + 2) * 128;
+            rangeF = (1:128) + idx * 128;
+            rangeT = (1:256) + 448 + idx * 128;
             subFrame = frameT(rangeT,:);
             subFrame = subFrame .* shortWindow;
-            frameF(rangeF,:) = mdct(subFrame);
+            frameF(rangeF, 1) = mdct(subFrame(:, 1));
+            frameF(rangeF, 2) = mdct(subFrame(:, 2));
         end
     case 'LSS'
         % A long window on the left and a short on the right.
@@ -56,4 +57,3 @@ n0 = (M + 1) / 2;
 T = cos(pi*(n + n0).*(k + 0.5)/M); % Transformation matrix.
 result = T * frame;
 end
-
