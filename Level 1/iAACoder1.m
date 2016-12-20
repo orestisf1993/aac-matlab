@@ -13,16 +13,8 @@ for i = 1:lengthAAC
     frameF = [AACSeq1(i).chl.frameF, AACSeq1(i).chr.frameF];
     frameT = iFilterbank(frameF, AACSeq1(i).frameType, AACSeq1(i).winType);
 
-    decoded((i - 1)*1024+1:i*1024,:) = decoded((i - 1)*1024+1:i*1024,:) + frameT(1:1024,:);
-    decoded(i*1024+1:(i + 1)*1024,:) = frameT(1025:2048,:);
-
-%     decodedRange = (i - 1)*1024+1:i*1024;
-%     %TODO: 2 decodedRange?
-%     decoded(decodedRange, :) = decoded(decodedRange, :) + frameT(1:1024,:);
-%     decoded(i*1024+1:(i + 1)*1024,:) = frameT(1025:2048,:);
-%     maybe:
-%     decodedRange = (i - 1)*1024+1:(i+1)*1024
-%     decoded(decodedRange, :) = frameT(1:2048,:);
+    decodedRange = (i - 1) * 1024 + 1:(i + 1) * 1024;
+    decoded(decodedRange,:) = decoded(decodedRange,:) + frameT(1:2048,:);
 end
 
 fs = 48000; % Frequency defined by assignment.

@@ -20,18 +20,12 @@ N = length(input);
 N = N - mod(N, frameWidth); % Number of elements should be divisible by frameWidth.
 input = input(1:N,:);
 
-%% Pad with zeros.
-%TODO: remove or use.
-% Add half a frame before and after.
-% input = [zeros(frameWidth * overlap, 2); input(1:N, :); zeros(frameWidth * overlap, 2)];
-
 %% Prepare the output.
 AACSeq1 = struct('frameType', {}, 'winType', {}, ...
     'chl', struct('frameF', {}), ...
     'chr', struct('frameF', {}));
 
 %% Perform the encoding
-% numberOfFrames = N / (frameWidth * overlap); % <-- with padding %TODO: remove or use.
 numberOfFrames = 1 / overlap * (N / frameWidth - 1);
 prevType = 'OLS';
 for frameIdx = 0:numberOfFrames - 1
