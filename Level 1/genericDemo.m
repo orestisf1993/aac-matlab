@@ -28,4 +28,3 @@ fprintf('Level %d: SNR for channel 1: %g.\n', level, snr(input(:, 1), noise(:, 1
 fprintf('Level %d: SNR for channel 2: %g.\n', level, snr(input(:, 2), noise(:, 2)));
 
 end
-
