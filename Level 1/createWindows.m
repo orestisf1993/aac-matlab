@@ -50,7 +50,7 @@ end
 
 
 function window = SINWindow(N)
-x = 1:N;
+x = 0:N-1;
 window = sin(pi / N * (x + 0.5));
 window = window.';
 end
