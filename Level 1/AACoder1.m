@@ -12,13 +12,17 @@ function AACSeq1 = AACoder1(fNameIn)
 
 frameWidth = 2048;
 overlap = 0.5;
-winType = 'KBD';
+winType = 'SIN';
 
 %% Read file
 input = audioread(fNameIn); % Assuming 48kHz.
 N = length(input);
 N = N - mod(N, frameWidth); % Number of elements should be divisible by frameWidth.
 input = input(1:N,:);
+
+%% Pad with zeros.
+input = [zeros(frameWidth/2, 2); input; zeros(frameWidth/2, 2)];
+N = N + 2048;
 
 %% Prepare the output.
 AACSeq1 = struct('frameType', {}, 'winType', {}, ...

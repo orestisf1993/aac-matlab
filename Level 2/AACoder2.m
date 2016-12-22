@@ -22,6 +22,10 @@ N = length(input);
 N = N - mod(N, frameWidth); % Number of elements should be divisible by frameWidth.
 input = input(1:N,:);
 
+%% Pad with zeros.
+input = [zeros(frameWidth/2, 2); input; zeros(frameWidth/2, 2)];
+N = N + 2048;
+
 %% Prepare the output.
 AACSeq2 = struct('frameType', {}, 'winType', {}, ...
     'chl', struct('frameF', {}, 'TNScoeffs', {}), ...

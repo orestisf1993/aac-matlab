@@ -5,6 +5,7 @@ function x = iAACoder1(AACSeq1, fNameOut)
 %
 %   See also AACODER1, SSC, IFILTERBANK, DEMOAAC1.
 
+frameWidth = 2048;
 lengthAAC = length(AACSeq1);
 decodedLength = (lengthAAC + 1) * 1024;
 decoded = zeros(decodedLength, 2);
@@ -17,6 +18,13 @@ for i = 1:lengthAAC
     decoded(decodedRange,:) = decoded(decodedRange,:) + frameT(1:2048,:);
 end
 
+%% Remove padded zeros.
+N = length(decoded);
+decoded = decoded(frameWidth/2+1:end-frameWidth/2, :);
+assert(length(decoded) == N - frameWidth);
+
+
+%% Save results.
 fs = 48000; % Frequency defined by assignment.
 audiowrite(fNameOut, decoded, fs);
 
