@@ -39,18 +39,25 @@ end
 
 
 function window = KDBWindow(N, alpha)
-w = kaiser(N/2+1, pi*alpha);
 window = zeros(N, 1);
-denominator = sqrt(sum(w));
-for n = 1:N / 2
-    window(n) = sqrt(sum(w(1:n+1))) / denominator;
+sumvalue = 0;
+beta = pi * alpha;
+
+for i = 0:N / 2 - 1
+    sumvalue = sumvalue + besseli(0, beta*sqrt(1-(4 * i / N - 1)^2));
+    window(i + 1) = sumvalue;
 end
-window(N/2+1:N) = window(N/2:-1:1);
+sumvalue = sumvalue + besseli(0, beta*sqrt(1-(4 * (N / 2) / N - 1)^2));
+
+for i = 0:N / 2 - 1
+    window(i + 1) = sqrt(window(i+1)/sumvalue);
+    window(N-i) = window(i+1);
+end
 end
 
 
 function window = SINWindow(N)
-x = 0:N-1;
+x = 0:N - 1;
 window = sin(pi / N * (x + 0.5));
 window = window.';
 end

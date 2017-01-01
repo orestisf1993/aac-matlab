@@ -84,7 +84,7 @@ rot(t+1,:) = x(t-N4+1,:);
 
 % We need this twice so keep it around
 t = (0:(N4 - 1)).';
-w = diag(sparse(exp(-j*2*pi*(t + 1 / 8)/N)));
+w = diag(sparse(exp(-1i*2*pi*(t + 1 / 8)/N)));
 
 % Pre-twiddle
 t = (0:(N4 - 1)).';
