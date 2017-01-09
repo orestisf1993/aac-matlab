@@ -1,6 +1,7 @@
 function [frameFout, TNScoeffs] = TNS(frameFin, frameType)
 %TNS Implements the Temporal Noise Shaping.
 %   Detailed explanation goes here
+%TODO
 
 assertIsFrameType(frameType);
 assertMDCTSize(frameFin, frameType);

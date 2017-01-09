@@ -1,6 +1,7 @@
 function SNR = genericDemo(fNameIn, fNameOut, level)
 %GENERICDEMO Summary of this function goes here
 %   Detailed explanation goes here
+%TODO
 
 encodeFun = str2func(strcat('AACoder', num2str(level)));
 decodeFun = str2func(strcat('iAACoder', num2str(level)));
