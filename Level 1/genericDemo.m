@@ -1,4 +1,4 @@
-function SNR = genericDemo(fNameIn, fNameOut, level)
+function [SNR, bitrate, compression] = genericDemo(fNameIn, fNameOut, level, fnameAACoded)
 %GENERICDEMO Summary of this function goes here
 %   Detailed explanation goes here
 %TODO
@@ -8,7 +8,11 @@ decodeFun = str2func(strcat('iAACoder', num2str(level)));
 
 fprintf('Encoding:');
 tic;
-AACSeq = encodeFun(fNameIn);
+if exist('fnameAACoded', 'var')
+    AACSeq = encodeFun(fNameIn, fnameAACoded);
+else
+    AACSeq = encodeFun(fNameIn);
+end
 toc;
 
 fprintf('Decoding:');
@@ -27,5 +31,9 @@ noise = input - output;
 SNR = snr(input, noise);
 fprintf('Level %d: SNR for channel 1: %g.\n', level, snr(input(:, 1), noise(:, 1)));
 fprintf('Level %d: SNR for channel 2: %g.\n', level, snr(input(:, 2), noise(:, 2)));
+if level >= 3 && nargout > 1
+    bitrate = 1;%TODO
+    compression = 1;%TODO
+end
 
 end

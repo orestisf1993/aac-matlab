@@ -3,7 +3,7 @@ function x = iAACoder2(AACSeq2, fNameOut)
 %   X = IAACODER2(AACSEQ2, FNAMEOUT) will decode aac sequence AACSEQ2 and save the
 %   output on file FNAMEOUT. X, if present, will contain the decoded sequence.
 %
-%   See also AACODER2, IAACODER1, ITNS, DEMOAAC1.
+%   See also AACODER2, IAACODER1, ITNS, DEMOAAC2.
 
 frameWidth = 2048;
 lengthAAC = length(AACSeq2);
