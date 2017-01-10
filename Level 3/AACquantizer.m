@@ -11,49 +11,61 @@ assertIsFrameType(frameType);
 
 %% Initialize.
 bands = initBands(frameType);
+Nb = length(bands)-1;
+isESH = strcmp(frameType, 'ESH');
+NSubFrames = 1 + isESH * 7;
+G = zeros(1, NSubFrames);
+sfc = zeros(Nb, NSubFrames);
+S = zeros(size(frameF));
 
-%% Energy of MDCT coefficients.
-P = bandEnergy(frameF);
+idx = 1;
+for frame = frameF
+    %% Energy of MDCT coefficients.
+    P = bandEnergy(frame, bands);
 
-%% Loudness threshold.
-T = P ./ SMR;
+    %% Loudness threshold.
+    T = P ./ SMR(:, idx);
 
-%% Scalefactor gains.
-MQ = 8191;
-a = 16 / 3 * log2(max(x)^(3/4)/MQ);
-while true
-    a = aNew;
-    P = quantizationError(frameF, a, bands);
-    aNew = a + (P < T);
-    if ~any(aNew~=a) || max(abs(diff(aNew))) > 60
-        break
+    %% Scalefactor gains.
+    MQ = 8191;
+    aNew = floor(16/3*log2(max(frame)^(3/4)/MQ));
+    aNew = ones(Nb, 1) * aNew;
+    while true
+        a = aNew;
+        P = quantizationError(frame, a, bands);
+        aNew = a + (P < T);
+        if all(aNew==a) || max(abs(diff(aNew))) > 60
+            break
+        end
     end
-end
 
-%% Return values.
-G = a(1);
-sfc = [G diff(a)];
+    %% Return values.
+    G(idx) = a(1);
+    sfc(:, idx) = [G; diff(a)];
+    S(:, idx) = quantize(frame, bandStretch(a, size(frameF), bands));
+    idx = idx + 1;
+end
+S = reshape(S, [1024 1]);
 end
 
 function P = bandEnergy(X, bands)
 bb = 1:length(bands)-1;
-P = zeros(size(bb));
+P = zeros(length(bb), 1);
 for b = bb
     wLow = bands(b);
-    wHigh = bands(b+1);
+    wHigh = bands(b+1)-1;%TODO: should it be -1 or not?
     k = wLow:wHigh;
     P(b) = sum(X(k).^2);
 end
 end
 
-function P = quantizationError(frameF, a, bands)
-a = bandStretch(a, size(frameF), bands);
-S = quantize(frameF, a);
-X = deQuantize(S, a);
-P = bandEnergy(S - X, bands);
+function P = quantizationError(X, a, bands)
+a = bandStretch(a, size(X), bands);
+S = quantize(X, a);
+Xbar = deQuantize(S, a);
+P = bandEnergy(X - Xbar, bands);
 end
 
-function S = quantize(frameF, a)
-magicNumber = 0.4054;
-S = sgn(frameF) .* floor((abs(frameF) .* (2.^(-a./4))).^(3/4) + magicNumber);
+function S = quantize(X, a)
+S = sign(X) .* fix((abs(X) .* 2.^(-1/4 * a)).^(3/4) + 0.4054);
 end
