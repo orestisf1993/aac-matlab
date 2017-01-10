@@ -9,9 +9,11 @@ function SMR = psycho(frameT, frameType, frameTprev1, frameTprev2)
 assertIsFrameType(frameType);
 
 %% Initialize.
-nColumns = size(frameT, 2);
+isESH = strcmp(frameType, 'ESH');
+nColumns = 1 + isESH * 7;
+frameT = reshape(frameT, [length(frameT) / nColumns, nColumns]);
 N = size(frameT, 1);
-w = 1:N / 2 + 1;
+w = 1:N/2;
 hannWindow = 0.5 - 0.5 * cos(pi / N * ((0:N - 1) + 0.5));
 hannWindow = hannWindow(:);
 [bands, qthr, bval] = initBands(frameType);
@@ -67,7 +69,7 @@ for columnIdx = 1:nColumns
     cn = zeros(length(bands)-1, 1);
     for b = bb
         wLow = bands(b);
-        wHigh = bands(b+1);
+        wHigh = bands(b+1)-1;
         wLocal = wLow:wHigh;
         e(b) = sum(r0(wLocal).^2);
         cn(b) = sum(c(wLocal).*(r0(wLocal).^2));
@@ -90,7 +92,7 @@ for columnIdx = 1:nColumns
     TMN = 18;
     SNR = tb * TMN + (1 - tb) * NMT;
     %% 9. From dB to energy ratio.
-    bc = 10.^(SNR / 10);
+    bc = 10.^(-SNR / 10);
     %% 10. Energy threshold.
     nb = en .* bc;
     %% 11.
@@ -113,6 +115,7 @@ end
 
 function [r, f] = frameFFT(frame)
 y = fft(frame);
+y = y(1:end/2);
 r = abs(y); % Magnitude
-f = unwrap(angle(y)); % Phase
+f = angle(y); % Phase
 end
