@@ -14,12 +14,12 @@ N = size(frameT, 1);
 w = 1:N / 2 + 1;
 hannWindow = 0.5 - 0.5 * cos(pi / N * ((0:N - 1) + 0.5));
 hannWindow = hannWindow(:);
-[bands, qthr] = initBands(frameType); %TODO: check if the bands are correct.
+[bands, qthr, bval] = initBands(frameType);
 bb = 1:length(bands) - 1;
 spreading = zeros(size(bands)-1);
 for b1 = bb
     for b2 = bb
-        spreading(b1, b2) = spreadingFunction(b1, b2, bands);
+        spreading(b1, b2) = spreadingFunction(b1, b2, bval);
     end
 end
 
