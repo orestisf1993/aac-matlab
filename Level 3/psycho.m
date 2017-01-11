@@ -5,7 +5,6 @@ function SMR = psycho(frameT, frameType, frameTprev1, frameTprev2)
 %   frames FRAMETPREV1 and FRAMETPREV2 and the frame type FRAMETYPE.
 
 %% Validate input.
-%TODO:3 frameTs
 assertIsFrameType(frameType);
 
 %% Initialize.
@@ -33,7 +32,6 @@ if isESH
     frameTprev1 = frameTprev1(:, end);
 end
 
-%TODO: persistent r,f?
 frame0 = frameTprev1;
 frame1 = frameTprev2;
 sw0 = frame0 .* hannWindow;
@@ -86,7 +84,6 @@ for columnIdx = 1:nColumns
     en = ecb ./ sum(spreading(bb,:), 1);
     %% 7. Tonality index.
     tb = -0.299 - 0.43 * log(cb);
-%     assert(all(tb > 0 && tb < 1), 'Tonality index out of bounds.');
     %% 8. SNR for each band.
     NMT = 6;
     TMN = 18;

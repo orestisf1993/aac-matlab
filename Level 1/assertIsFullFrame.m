@@ -1,6 +1,5 @@
 function assertIsFullFrame(frame, message, frameLength)
 %ASSERTISFULLFRAME Assertion that given frame is the correct size for the exercise.
-%TODO: rename
 if ~exist('frameLength', 'var')
     frameLength = 2048;
 end

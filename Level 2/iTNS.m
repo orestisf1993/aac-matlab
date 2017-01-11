@@ -1,7 +1,8 @@
 function frameFout = iTNS(frameFin, frameType, TNScoeffs)
 %ITNS Inverts Temporal Noise Shaping.
-%   Detailed explanation goes here
-%TODO
+%   FRAMEFOUT = ITNS(FRAMEFIN, FRAMETYPE, TNSCOEFFS) will invert TNSs output.
+%
+%   See also TNS.
 
 assertIsFrameType(frameType);
 assertMDCTSize(frameFin, frameType);

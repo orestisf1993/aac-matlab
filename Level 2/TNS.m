@@ -1,7 +1,10 @@
 function [frameFout, TNScoeffs] = TNS(frameFin, frameType)
 %TNS Implements the Temporal Noise Shaping.
-%   Detailed explanation goes here
-%TODO
+%   [FRAMEFOUT, TNSCOEFFS] = TNS(FRAMEFIN, FRAMETYPE) will perform TNS on frame FRAMEFIN of frame
+%   type FRAMETYPE. TNSCOEFFS are tha quantized TNS coefficients 4 x 8 for 'ESH' frame type and 4 x 1
+%   for other frame types. FRAMEFOUT are the MDCT coefficients after TNS, same size as FRAMEFIN.
+%
+%   See also ITNS.
 
 assertIsFrameType(frameType);
 assertMDCTSize(frameFin, frameType);
