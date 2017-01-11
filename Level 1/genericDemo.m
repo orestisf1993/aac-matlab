@@ -15,25 +15,42 @@ else
 end
 toc;
 
+%% Decode.
 fprintf('Decoding:');
 tic;
 output = decodeFun(AACSeq, fNameOut);
 toc;
 
-input = audioread(fNameIn);
+[input, fs] = audioread(fNameIn);
 % output = audioread(fNameOut);
 
+%% Calculate noise and SNR.
 common_length = min(length(input), length(output));
 input = input(1:common_length,:);
 output = output(1:common_length,:);
 noise = input - output;
 
 SNR = snr(input, noise);
+
+%% Results.
 fprintf('Level %d: SNR for channel 1: %g.\n', level, snr(input(:, 1), noise(:, 1)));
 fprintf('Level %d: SNR for channel 2: %g.\n', level, snr(input(:, 2), noise(:, 2)));
-if level >= 3 && nargout > 1
-    bitrate = 1;%TODO
-    compression = 1;%TODO
+if level >= 3
+    bitsPerByte = 8;
+    originalMetadata = dir(fNameIn);
+    originalBytes = strcat(num2str(originalMetadata.bytes), ' bytes');
+    originalBits = originalMetadata.bytes * bitsPerByte;
+    compressedMetadata = dir(fnameAACoded);
+    compressedSizeBytes = strcat(num2str(compressedMetadata.bytes), ' bytes');
+    compressedSizeBits = compressedMetadata.bytes * bitsPerByte;
+    compression = (compressedSizeBits / originalBits);
+    compressionRatioTimes = originalBits / compressedSizeBits;
+    bitrate = compressedSizeBits / (length(output) / fs);
+
+    fprintf('Uncompressed audio: %s (%d bits).\n', originalBytes, originalBits);
+    fprintf('Compressed struct : %s (%d bits).\n', compressedSizeBytes, compressedSizeBits);
+    fprintf('Compression ratio : %f%% (x %f).\n', compression * 100, compressionRatioTimes);
+    fprintf('Bitrate: %f kbits per second.\n', bitrate / 1000);
 end
 
 end
