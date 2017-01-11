@@ -8,6 +8,7 @@ function [S, sfc, G] = AACquantizer(frameF, frameType, SMR)
 
 %% Validate input.
 assertIsFrameType(frameType);
+assertMDCTSize(frameF, frameType);
 
 %% Initialize.
 bands = initBands(frameType);
@@ -53,7 +54,7 @@ bb = 1:length(bands)-1;
 P = zeros(length(bb), 1);
 for b = bb
     wLow = bands(b);
-    wHigh = bands(b+1)-1;%TODO: should it be -1 or not?
+    wHigh = bands(b+1)-1;
     k = wLow:wHigh;
     P(b) = sum(X(k).^2);
 end

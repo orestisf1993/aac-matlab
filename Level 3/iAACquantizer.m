@@ -24,5 +24,5 @@ for idx = 1:NSubFrames
 end
 
 %% Validate output.
-%TODO
+assertMDCTSize(frameF, frameType);
 end
