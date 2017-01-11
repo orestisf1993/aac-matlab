@@ -53,7 +53,7 @@ s2 = sum(frame(energyIdx).^2, 1);
 %% 3. Attack values.
 ds2 = zeros(size(s2));
 for idx = 2:length(ds2)
-    meanPreviousEnergy = sum(s2(1:idx - 1)) / idx;
+    meanPreviousEnergy = sum(s2(1:idx-1)) / idx;
     ds2(idx) = s2(idx) / meanPreviousEnergy;
 end
 
@@ -89,7 +89,7 @@ types = {'OLS', 'LSS', 'ESH', 'LPS'};
 for key1 = types
     for key2 = types
         cat = strcat(key1, '-', key2);
-        keys{idx} = cat{:};  % strcat result here is a 1x1 cell array.
+        keys{idx} = cat{:}; % strcat result here is a 1x1 cell array.
         idx = idx + 1;
     end
 end

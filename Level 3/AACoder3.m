@@ -65,12 +65,6 @@ for frameIdx = 0:numberOfFrames - 1
     end
     [frameFL, AACSeq3(frameIdx+1).chl.TNScoeffs] = TNS(frameFL, prevType);
     [frameFR, AACSeq3(frameIdx+1).chr.TNScoeffs] = TNS(frameFR, prevType);
-%
-%     chs = {AACSeq3(frameIdx+1).chl, AACSeq3(frameIdx+1).chr};
-%     frameFs = {frameFL, frameFR};
-%     for chIdx = 1:2
-%     ch = chs{chIdx};
-%     frameF = frameFs{chIdx};
 
     SMR = psycho(frameT(:, 1), prevType, frameTprev1(:, 1), frameTprev2(:, 1));
     [S, sfc, AACSeq3(frameIdx+1).chl.G] = AACquantizer(frameFL, prevType, SMR);
@@ -81,7 +75,6 @@ for frameIdx = 0:numberOfFrames - 1
     [S, sfc, AACSeq3(frameIdx+1).chr.G] = AACquantizer(frameFR, prevType, SMR);
     AACSeq3(frameIdx+1).chr.sfc = encodeHuff(sfc(:), huffLUT, 12);
     [AACSeq3(frameIdx+1).chr.stream, AACSeq3(frameIdx+1).chr.codebook] = encodeHuff(S, huffLUT);
-%     end
 end
 
 if exist('fnameAACoded', 'var')

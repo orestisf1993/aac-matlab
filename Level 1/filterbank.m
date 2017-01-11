@@ -88,7 +88,7 @@ w = diag(sparse(exp(-1i*2*pi*(t + 1 / 8)/N)));
 
 % Pre-twiddle
 t = (0:(N4 - 1)).';
-c = (rot(2*t+1,:) - rot(N-1-2*t+1,:))  - 1i * (rot(M+2*t+1,:) - rot(M-1-2*t+1,:));
+c = (rot(2*t+1,:) - rot(N-1-2*t+1,:)) - 1i * (rot(M+2*t+1,:) - rot(M-1-2*t+1,:));
 % This is a really cool Matlab trick ;)
 c = 0.5 * w * c;
 

@@ -7,7 +7,7 @@ function frameF = iAACquantizer(S, sfc, G, frameType)
 
 %% Validate input.
 assertIsFrameType(frameType);
-assert(all(G == sfc(1, :)), 'sfc does not start with G.');
+assert(all(G == sfc(1,:)), 'sfc does not start with G.');
 
 %% Initialize.
 bands = initBands(frameType);

@@ -19,7 +19,7 @@ decodeFun = str2func(strcat('iAACoder', num2str(level)));
 fprintf('Encoding:');
 tic;
 if exist('fnameAACoded', 'var')
-    assert(level==3, 'fnameAACoded supported only by level 3.');
+    assert(level == 3, 'fnameAACoded supported only by level 3.');
     AACSeq = encodeFun(fNameIn, fnameAACoded);
 else
     AACSeq = encodeFun(fNameIn);
@@ -60,8 +60,8 @@ if level >= 3
 
     fprintf('Uncompressed audio: %s (%d bits).\n', originalBytes, originalBits);
     fprintf('Compressed struct : %s (%d bits).\n', compressedSizeBytes, compressedSizeBits);
-    fprintf('Compression ratio : %f%% (x %f).\n', compression * 100, compressionRatioTimes);
-    fprintf('Bitrate: %f kbits per second.\n', bitrate / 1000);
+    fprintf('Compression ratio : %f%% (x %f).\n', compression*100, compressionRatioTimes);
+    fprintf('Bitrate: %f kbits per second.\n', bitrate/1000);
 end
 
 end

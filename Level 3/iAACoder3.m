@@ -22,11 +22,11 @@ for frameIdx = 1:lengthAAC
         sfc = decodeHuff(ch.sfc, 12, huffLUT);
         S = decodeHuff(ch.stream, ch.codebook, huffLUT);
         if isESH
-            sfc = reshape(sfc, [42 8]);
-            S = reshape(S, [128 8]);
+            sfc = reshape(sfc, [42, 8]);
+            S = reshape(S, [128, 8]);
         else
-            sfc = reshape(sfc, [69 1]);
-            S = reshape(S, [1024 1]);
+            sfc = reshape(sfc, [69, 1]);
+            S = reshape(S, [1024, 1]);
         end
         frameFs{chIdx} = iAACquantizer(S, sfc, ch.G, frameType);
     end
@@ -34,20 +34,20 @@ for frameIdx = 1:lengthAAC
     frameFs{1} = iTNS(frameFs{1}, AACSeq3(frameIdx).frameType, AACSeq3(frameIdx).chl.TNScoeffs);
     frameFs{2} = iTNS(frameFs{2}, AACSeq3(frameIdx).frameType, AACSeq3(frameIdx).chr.TNScoeffs);
     if isESH
-        frameFs{1} = reshape(frameFs{1}, [frameWidth/2, 1]);
-        frameFs{2} = reshape(frameFs{2}, [frameWidth/2, 1]);
+        frameFs{1} = reshape(frameFs{1}, [frameWidth / 2, 1]);
+        frameFs{2} = reshape(frameFs{2}, [frameWidth / 2, 1]);
     end
     frameF = [frameFs{1}, frameFs{2}];
     frameT = iFilterbank(frameF, AACSeq3(frameIdx).frameType, AACSeq3(frameIdx).winType);
 
-    decodedRange = (frameIdx - 1) * frameWidth/2 + 1:(frameIdx + 1) * frameWidth/2;
+    decodedRange = (frameIdx - 1) * frameWidth / 2 + 1:(frameIdx + 1) * frameWidth / 2;
     decoded(decodedRange,:) = decoded(decodedRange,:) + frameT(1:frameWidth,:);
 end
 
 %% Remove padded zeros.
 N = length(decoded);
-decoded = decoded(frameWidth/2+1:end-frameWidth/2, :);
-assert(length(decoded) == N - frameWidth);
+decoded = decoded(frameWidth/2+1:end-frameWidth/2,:);
+assert(length(decoded) == N-frameWidth);
 
 
 %% Save results.
