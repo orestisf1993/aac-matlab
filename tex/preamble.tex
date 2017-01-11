@@ -1,0 +1,210 @@
+\documentclass[12pt,a4paper,titlepage,oneside]{scrartcl}
+
+%\usepackage[includeheadfoot]{geometry}
+%\usepackage[left=1in,right=1in,top=1in,bottom=1.5in]{geometry}
+
+% ---------------------
+% KOMA-SPECIFIC OPTIONS
+% ---------------------
+%\addtokomafont{disposition}{\rmfamily}
+\addtokomafont{author}{\large}
+\addtokomafont{subject}{\sffamily}
+\addtokomafont{subtitle}{\Large\rmfamily}
+\addtokomafont{date}{\large}
+\addtokomafont{caption}{\small}
+\addtokomafont{captionlabel}{\small}
+
+% Headers, Footers
+\usepackage[automark,headsepline,footsepline]{scrlayer-scrpage}
+
+\clearpairofpagestyles
+\lohead{Κωδικοποιητής/Αποκωδικοποιητής AAC}
+\rehead{Κωδικοποιητής/Αποκωδικοποιητής AAC}
+
+\lehead{\headmark}
+\rohead{\headmark}
+
+\lofoot{Σελίδα \thepage\ από \pageref{LastPage}}
+\refoot{Σελίδα \thepage\ από \pageref{LastPage}}
+\pagestyle{scrheadings}
+
+\setkomafont{pagehead}{\normalfont}
+\setkomafont{pagefoot}{\normalfont}
+
+% Heading spacings
+\RedeclareSectionCommand[
+  beforeskip=-.5\baselineskip,
+  afterskip=.01\baselineskip]{section}
+\RedeclareSectionCommand[
+  beforeskip=-.5\baselineskip,
+  afterskip=1sp]{subsection}
+\RedeclareSectionCommand[
+  beforeskip=-.5\baselineskip,
+  afterskip=1sp]{subsubsection}
+%\RedeclareSectionCommand[
+%  beforeskip=.5\baselineskip,
+%  afterskip=-1em]{paragraph}
+%\RedeclareSectionCommand[
+%  beforeskip=-.5\baselineskip,
+%  afterskip=-1em]{subparagraph}
+
+% ----------------------
+% MISCELLANEOUS PACKAGES
+% ----------------------
+% Minted package for the listings.
+\usepackage[newfloat=true]{minted}
+\setminted{%
+    autogobble=true,%
+    breaklines=true,%
+    frame=none,%
+    linenos=false%
+}
+
+\setcounter{tocdepth}{3} % subsub has numbers
+\setcounter{secnumdepth}{3} % subsub in toc
+
+% Argument 'table' for '\cellcolor{}' command.
+% Should be high because it might get loaded by another package with different arguments:
+% - http://tex.stackexchange.com/questions/87197/latex-error-option-clash-for-package-xcolor-for-table
+% - http://tex.stackexchange.com/questions/83101/option-clash-for-package-xcolor
+\usepackage[usenames, table]{xcolor}
+
+% For \includegraphics.
+% https://ctan.org/pkg/graphicx
+\usepackage{graphicx}
+\graphicspath{{./figures/}{./images/}}
+
+% Provides LaTeX the ability to create hyperlinks within the document.
+% https://www.ctan.org/pkg/hyperref
+% http://en.wikibooks.org/wiki/LaTeX/Hyperlinks#Hyperref
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    linkcolor={blue!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!70!black},
+    breaklinks=true
+}
+
+% Go to the top of an image when a figure reference is clicked:
+% http://stackoverflow.com/a/21251925/3430986%
+\usepackage{caption}
+
+% Extra argument for the enumerate enviroment.
+% http://ctan.org/pkg/enumerate
+\usepackage{enumerate}
+\renewcommand{\labelenumii}{\Roman{enumii}}
+
+% \multirow in tables.
+\usepackage{multirow}
+% Used for better handling of multi-line rows on tables.
+\usepackage{tabularx}
+% Better tables.
+\usepackage{booktabs}
+
+% For \FloatBarrier.
+\usepackage[section]{placeins}
+\makeatletter
+\AtBeginDocument{%
+  \expandafter\renewcommand\expandafter\subsection\expandafter{%
+    \expandafter\@fb@secFB\subsection
+  }%
+}
+\makeatother
+
+% For maxsizebox:
+% http://stackoverflow.com/a/29143366/3430986
+\usepackage{adjustbox}
+% For figure 'H' placement.
+\usepackage{float}
+
+%\usepackage{etoolbox}
+
+% For logo in footer.
+%\usepackage[all]{background}
+\usepackage{lastpage}
+
+% Quick image refs etc.
+\newcommand{\imageref}[1] {%
+\hyperref[fig:#1]{\figurename{} \ref{fig:#1}}}
+
+\newcommand{\imagehere}[2]{%
+\begin{figure}[H]%
+\centering%
+\includegraphics[keepaspectratio, width=1.0\linewidth]{images/#1}%
+\caption{#2}
+\label{fig:#1}%
+\end{figure}%
+}
+
+% Define code enviroment for captions and whatnot.
+\newenvironment{code}{\captionsetup{type=listing}}{}
+% Fix tikz's "some package has redefined the meaning of the math-mode dollar sign" bug/error.
+% https://github.com/HiSPARC/infopakket/issues/27#issuecomment-134511920
+% http://tex.stackexchange.com/questions/165929/semiverbatim-with-tikz-in-beamer
+\makeatletter
+\global\let\tikz@ensure@dollar@catcode=\relax
+\makeatother
+
+% For subfigures
+\usepackage{subcaption}
+
+% For quotations. Verbatim enviroment for non-code text.
+% csquotes should be loaded after fvextra, to avoid a warning from the lineno package
+\usepackage{csquotes}
+
+% ---------------------
+%     CUSTOM MATH
+% ---------------------
+% http://tex.stackexchange.com/a/56953/78791
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+% http://tex.stackexchange.com/a/107190/78791
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+%% Number specific equation in align*
+%\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+%
+%% bad fonts for implies?
+%\renewcommand{\implies}{=\!\Rightarrow}
+
+% To use float.sty properly, load package float before wrapfig, and declare any new float types after loading both.
+\usepackage{wrapfig}
+\makeatletter
+\newcommand{\forceendwrapfig}{\WF@finale{}}
+\makeatother
+
+% Fix URLs not breaking in citations
+% http://tex.stackexchange.com/a/115820/93245
+\usepackage{breakcites}
+\urlstyle{same}
+\Urlmuskip=0mu plus 1mu\relax
+
+% ---------------------
+%        FONTS & LANGUAGE
+% ---------------------
+\usepackage{amsmath}
+\usepackage{mathspec}
+
+\setmainfont[
+  Mapping=tex-text,
+  BoldFont=GFSDidotBold.otf]{GFSDidot.otf}
+\setsansfont[
+  Mapping=tex-text,
+  BoldFont=GFSNeohellenicBold.otf]{GFSNeohellenic.otf}
+\setmathsfont[
+  Set=Greek]{GFSDidot.otf}
+\setmonofont[Scale=MatchLowercase]{Hack}
+\newfontfamily\greekfonttt[Scale=MatchLowercase]{Hack}
+%\linespread{1.05}
+
+% Polyglossia warning: due to a bug (https://github.com/reutenauer/polyglossia/issues/110) numbering with greek letters is incorrect.
+% /usr/share/texmf-dist/tex/latex/polyglossia/gloss-greek.ldf must be edited.
+% or \setmainlanguage[numerals=arabic]{greek} should be used instead.
+\usepackage{polyglossia}
+\setmainlanguage{greek}
+\setotherlanguages{english}
+\PolyglossiaSetup{greek}{indentfirst=true}
+\PolyglossiaSetup{english}{indentfirst=true}
+
+\usepackage{microtype}
