@@ -1,14 +1,25 @@
 function [SNR, bitrate, compression] = genericDemo(fNameIn, fNameOut, level, fnameAACoded)
-%GENERICDEMO Summary of this function goes here
-%   Detailed explanation goes here
-%TODO
+%GENERICDEMO Generic demo code for all 3 levels of the project.
+%   SNR = GENERICDEMO(FNAMEIN, FNAMEOUT, LEVEL) will encode audio file FNAMEIN with AAC of level
+%   LEVEL and save the output in FNAMEOUT. SNR is the signal to noise ratio.
+%   GENERICDEMO(FNAMEIN, FNAMEOUT, LEVEL, FNAMEAACODED) will save the AAC structure in FNAMEAACODED.
+%   Only for level 3.
+%   [SNR, BITRATE, COMPRESSION] = GENERICDEMO(FNAMEIN, FNAMEOUT, LEVEL) will also return the bitrate
+%   BITRATE and the compression rate (compressed size / original size) COMPRESSION. Only for level
+%   3.
+%
+%   See also DEMOAAC1, DEMOAAC2, DEMOAAC3.
+
+assert(any(level == [1, 2, 3]), 'Unsupported level.');
 
 encodeFun = str2func(strcat('AACoder', num2str(level)));
 decodeFun = str2func(strcat('iAACoder', num2str(level)));
 
+%% Encode.
 fprintf('Encoding:');
 tic;
 if exist('fnameAACoded', 'var')
+    assert(level==3, 'fnameAACoded supported only by level 3.');
     AACSeq = encodeFun(fNameIn, fnameAACoded);
 else
     AACSeq = encodeFun(fNameIn);
