@@ -7,13 +7,21 @@ function frameF = iAACquantizer(S, sfc, G, frameType)
 
 %% Validate input.
 assertIsFrameType(frameType);
-assert(G == sfc(1), 'sfc does not start with G.');
+assert(all(G == sfc(1, :)), 'sfc does not start with G.');
 
-%%
-bands = initBands();
-a = cumsum(sfc);
-a = bandStretch(a, size(S), bands);
-frameF = deQuantize(S, a);
+%% Initialize.
+bands = initBands(frameType);
+isESH = strcmp(frameType, 'ESH');
+NSubFrames = 1 + isESH * 7;
+frameFSize = [1024 / NSubFrames, NSubFrames];
+frameF = zeros(frameFSize);
+
+%% Loop through each frame.
+for idx = 1:NSubFrames
+    a = cumsum(sfc(:, idx));
+    a = bandStretch(a, [1024 / NSubFrames, 1], bands);
+    frameF(:, idx) = deQuantize(S(:, idx), a);
+end
 
 %% Validate output.
 %TODO

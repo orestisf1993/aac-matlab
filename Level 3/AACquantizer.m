@@ -41,8 +41,8 @@ for frame = frameF
 
     %% Return values.
     G(idx) = a(1);
-    sfc(:, idx) = [G; diff(a)];
-    S(:, idx) = quantize(frame, bandStretch(a, size(frameF), bands));
+    sfc(:, idx) = [a(1); diff(a)];
+    S(:, idx) = quantize(frame, bandStretch(a, size(frame), bands));
     idx = idx + 1;
 end
 S = reshape(S, [1024 1]);
