@@ -212,4 +212,5 @@ slprj/
 # Session info
 octave-workspace
 
+*.mat
 *.wav
