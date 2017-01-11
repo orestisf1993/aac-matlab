@@ -49,6 +49,10 @@ N = length(decoded);
 decoded = decoded(frameWidth/2+1:end-frameWidth/2,:);
 assert(length(decoded) == N-frameWidth);
 
+%% Normalize.
+decoded(:, 1) = decoded(:, 1) ./ max(abs(decoded(:, 1)));
+decoded(:, 2) = decoded(:, 2) ./ max(abs(decoded(:, 2)));
+
 
 %% Save results.
 fs = 48000; % Frequency defined by assignment.
