@@ -1,6 +1,6 @@
 \section{Level 1}
 \subsection{Υλοποίηση}
-\subsubsection{Συναρτήσεις για ελέγχους}
+\subsubsection{Συναρτήσεις για ελέγχους}\label{sub:asserts1}
 Οι συναρτήσεις με όνομα \texttt{assert*} χρησιμοποιούνται σε διάφορα μέρη στο project για τη πραγματοποίηση απλών ελέγχων των δεδομένων.
 Στο πρώτο επίπεδο χρησιμοποιούνται οι εξής:
 \begin{enumerate}
@@ -29,7 +29,7 @@
 \item Η υποσυνάρτηση \texttt{mdct()} και η συνάρτηση \texttt{imdct()} βρέθηκαν στο \url{http://www.ee.columbia.edu/~marios/mdct/mdct_giraffe.html} και υποστήκαν μικρές αλλαγές.
 \end{itemize}
 
-\subsubsection{\texttt{AACoder1} και \texttt{iAACoder1}}
+\subsubsection{\texttt{AACoder1} και \texttt{iAACoder1}}\label{sub:AACoder1}
 Η \texttt{AACoder1}, αφού διαβάσει το αρχείο \texttt{fNameIn}, προσθέτει από μισό frame με μηδενικά στην αρχή και στο τέλος της ακολουθίας \texttt{input} που πρόκειται να κωδικοποιηθεί.
 Αυτό βοηθάει στη μείωση του θορύβου που εμφανίζεται στα άκρα της ακολουθίας μετά την κωδικοποίηση και προκαλεί μείωση του $SNR$.
 Η \texttt{iAACoder1} αναλαμβάνει την αφαίρεση αυτών των ημι-frame μετά την αποκωδικοποίηση.
@@ -39,7 +39,7 @@
 Η τιμή \texttt{prevType} θεωρείται ότι είναι πάντα \mintinline{MATLAB}!'OLS'! για το πρώτο frame.
 
 \subsubsection{\texttt{demoAAC1}}
-Για να αποφευχθεί η εγγραφή του ίδιου κώδικα πολλές φορές και τα 3 "demo" του project χρησιμοποιούν τη κοινή συνάρτηση \texttt{genericDemo()}.
+Για να αποφευχθεί η εγγραφή του ίδιου κώδικα πολλές φορές και τα 3 "demo" του project χρησιμοποιούν τη κοινή συνάρτηση \texttt{genericDemo()}\label{genericDemo}.
 Σε αυτή επιλέγονται η συνάρτηση κωδικοποίησης \texttt{encodeFun} και η συνάρτηση αποκωδικοποίησης \texttt{decodeFun} σύμφωνα με το όρισμα \texttt{level} (τιμές 1, 2 ή 3).
 Έτσι, η συνάρτηση \texttt{demoAAC1} αρκεί να την καλέσει ως \mintinline{MATLAB}!SNR = genericDemo(fNameIn, fNameOut, 1)!.
 

@@ -1,3 +1,56 @@
 \section{Level 2}
 \subsection{Υλοποίηση}
+\subsubsection{Συναρτήσεις για ελέγχους}\label{sub:asserts2}
+Πέρα από τις συναρτήσεις που αναφέρθηκαν στο \hyperref[sub:asserts1]{επίπεδο 1} χρησιμοποιείται και η συνάρτηση \texttt{assertMDCTSize} σε αυτό το επίπεδο.
+
+\subsubsection{\texttt{TNS} και \texttt{iTNS}}
+\begin{itemize}
+\item\label{initBands} Οι πίνακες \textit{B.2.1.9.a} και \textit{B.2.1.9.b} του αρχείου \texttt{w2203tfa} αρχικοποιούνται μέσω της συνάρτησης \texttt{initBands()}.
+Οι τιμές του \textit{B.2.1.9.b} χρησιμοποιούνται αν το \texttt{frameType} είναι \mintinline{MATLAB}!'ESH'! αλλιώς χρησιμοποιούνται οι τιμές του \textit{B.2.1.9.b}.
+
+Οι τιμές της στήλης \texttt{w\_low} επιστρέφονται στο πίνακα \texttt{bands} αφού αυξηθούν κατά ένα καθώς οι δείκτες του MATLAB ξεκινάνε από το μηδέν.
+Μια επιπλέον στήλη προστίθεται στον πίνακα \texttt{bands} για να σηματοδοτεί το τέλος της τελευταίας μπάντας.
+Έτσι, η πρώτη μπάντα βρίσκεται μεταξύ \mintinline{MATLAB}!bands(1)! και \mintinline{MATLAB}!bands(2)-1! ενώ η τελευταία βρίσκεται μεταξύ \mintinline{MATLAB}!bands(end-1)! και \mintinline{MATLAB}!bands(end)-1!.
+
+Αν χρησιμοποιηθούν τα αντίστοιχα ορίσματα (έλεγχος μέσω \mintinline{MATLAB}!nargout!) η \texttt{initBands} επιστρέφει και τις τιμές από τις στήλες \texttt{qthr} και \texttt{bval}.
+
+\item Οι συντελεστές κανονικοποίησης \texttt{Sw} των συντελεστών MDCT πραγματοποιείται στην υποσυνάρτηση \texttt{normalizationCoeff()}.
+
+\item Οι συντελεστές \texttt{a} υπολογίζονται μέσω της υποσυνάρτησης \texttt{linearCoeffs()}.
+Για την επίλυση των κανονικών εξισώσεων χρησιμοποιείται η συνάρτηση του MATLAB \mintinline{MATLAB}!lpc!.
+
+\item Η κβάντιση των \texttt{a} σύμφωνα με την εκφώνηση πραγματοποιείται στη \texttt{linearCoeffs()}.
+
+\item Η εφαρμογή του FIR φίλτρου και η επιστροφή των τελικών συντελεστών του TNS γίνεται από την υποσυνάρτηση \texttt{filterFrame()}.
+Το FIR φίλτρο χρησιμοποιεί και πάλι την \mintinline{MATLAB}!filter! του MATLAB (με \mintinline{MATLAB}!b=1!).
+Επίσης, καλείται η \texttt{makeInvertible()} έτσι ώστε να "πιέσει" τις τιμές του \texttt{a} μέσα στο μοναδιαίο κύκλο και να αντικαταστήσει τα μηδενικά με ένα ελάχιστο \mintinline{MATLAB}!e! ώστε να αποφευχθούν οι διαιρέσεις με το μηδέν.
+
+\item Η αντιστροφή με την \texttt{iTNS} είναι απλή αφού αρκεί η αντιστροφή του φίλτρου.
+Δηλαδή, αντί για \mintinline{MATLAB}!filter(a, 1, frame)! καλείται \mintinline{MATLAB}!filter(1, a, frame)!.
+\end{itemize}
+
+\subsubsection{\texttt{AACoder2} και \texttt{iAACoder2}}
+Αρκεί η προσθήκη της κλήσης των συναρτήσεων \texttt{TNS} και \texttt{iTNS} στη κυρίως λούπα του κώδικα που αναπτύχθηκε στο \hyperref[sub:AACoder1]{πρώτο επίπεδο}.
+
+\subsubsection{\texttt{demoAAC2}}
+Η συνάρτηση \texttt{demoAAC2} αρκεί να καλέσει την \hyperref[genericDemo]{\texttt{genericDemo}}
+ως \mintinline{MATLAB}!SNR = genericDemo(fNameIn, fNameOut, 2)!.
+
 \subsection{Αποτελέσματα}
+Όπως και στο \hyperref[sub:results1]{πρώτο επίπεδο},
+παρατηρούμε γρήγορη εκτέλεση και signal to noise ratio ίσο με $307 dB$.
+Αυτό σημαίνει ότι οι μόνες απώλειες που έχουμε είναι λόγω της ακρίβειας των πράξεων του MATLAB.
+\begin{code}
+\begin{minted}{MATLAB}
+>> SNR = demoAAC2('input.wav', 'output.wav')
+Encoding:Elapsed time is 1.573226 seconds.
+Decoding:Elapsed time is 0.295517 seconds.
+Level 2: SNR for channel 1: 307.853.
+Level 2: SNR for channel 2: 307.905.
+
+SNR =
+
+  307.8801
+\end{minted}
+\caption{SNR για την υλοποίηση του δεύτερου επιπέδου με παράθυρο \texttt{SIN}}
+\end{code}
