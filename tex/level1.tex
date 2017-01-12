@@ -1,3 +1,79 @@
 \section{Level 1}
 \subsection{Υλοποίηση}
-\subsection{Αποτελέσματα}
+\subsubsection{Συναρτήσεις για ελέγχους}
+Οι συναρτήσεις με όνομα \texttt{assert*} χρησιμοποιούνται σε διάφορα μέρη στο project για τη πραγματοποίηση απλών ελέγχων των δεδομένων.
+Στο πρώτο επίπεδο χρησιμοποιούνται οι εξής:
+\begin{enumerate}
+\item \texttt{assertIsFrameType}
+\item \texttt{assertIsFullFrame}
+\item \texttt{assertIsWinType}
+\end{enumerate}
+
+\subsubsection{\texttt{SSC}}
+\begin{itemize}
+\item Για το φιλτράρισμα των frame με το υψιπερατό φίλτρο χρησιμοποιείται η υποσυνάρτηση \texttt{filterFrame()} που χρησιμοποιεί τη συνάρτηση \mintinline{MATLAB}!filter! του MATLAB.
+\item Η λογική επιλογής του frame $i$ σύμφωνα με το frame $i-1$ γίνεται με τις υποσυναρτήσεις \texttt{nextFrameIsESH()} και \texttt{typeFromAdjacent()}.
+\item Η λογική για την απόφαση του τελικού τύπου frame σύμφωνα με το πίνακα 1 της εκφώνησης γίνεται με τη δημιουργία map στην υποσυνάρτηση \texttt{decisionTable()}.
+\end{itemize}
+
+\subsubsection{\texttt{filterbank} και \texttt{iFilterbank}}
+\begin{itemize}
+\item Η δημιουργία των παραθύρων γίνεται στη συνάρτηση \texttt{createWindow()}.
+
+Για την δημιουργία παραθύρων τύπου \texttt{KDB} \textbf{δεν} χρησιμοποιήθηκε η συνάρτηση \mintinline{MATLAB}!kaiser! του MATLAB αλλά η \mintinline{MATLAB}!besseli! για την υλοποίηση σύμφωνα με τους τύπους της εκφώνησης.
+Τα παράθυρα KDB ελέγχτηκαν μέσω της συνθήκης Princen-Bradley.
+Μέρος της συνάρτησης μεταφράστηκε από το αρχείο \texttt{kbdwin.c} από \url{http://www.ee.columbia.edu/~marios/mdct/mdct_giraffe.html}.
+
+Η δημιουργία παραθύρων SIN είναι απλή.
+
+\item Η υποσυνάρτηση \texttt{mdct()} και η συνάρτηση \texttt{imdct()} βρέθηκαν στο \url{http://www.ee.columbia.edu/~marios/mdct/mdct_giraffe.html} και υποστήκαν μικρές αλλαγές.
+\end{itemize}
+
+\subsubsection{\texttt{AACoder1} και \texttt{iAACoder1}}
+Η \texttt{AACoder1}, αφού διαβάσει το αρχείο \texttt{fNameIn}, προσθέτει από μισό frame με μηδενικά στην αρχή και στο τέλος της ακολουθίας \texttt{input} που πρόκειται να κωδικοποιηθεί.
+Αυτό βοηθάει στη μείωση του θορύβου που εμφανίζεται στα άκρα της ακολουθίας μετά την κωδικοποίηση και προκαλεί μείωση του $SNR$.
+Η \texttt{iAACoder1} αναλαμβάνει την αφαίρεση αυτών των ημι-frame μετά την αποκωδικοποίηση.
+
+Η κωδικοποίηση γίνεται με μια λούπα \mintinline{MATLAB}!for! για κάθε ένα από τα \texttt{numberOfFrames} frames.
+Η διαδικασία για κάθε frame ακολουθείται σε σχέση με το διάγραμμα της εκφώνησης.
+Η τιμή \texttt{prevType} θεωρείται ότι είναι πάντα \mintinline{MATLAB}!'OLS'! για το πρώτο frame.
+
+\subsubsection{\texttt{demoAAC1}}
+Για να αποφευχθεί η εγγραφή του ίδιου κώδικα πολλές φορές και τα 3 "demo" του project χρησιμοποιούν τη κοινή συνάρτηση \texttt{genericDemo()}.
+Σε αυτή επιλέγονται η συνάρτηση κωδικοποίησης \texttt{encodeFun} και η συνάρτηση αποκωδικοποίησης \texttt{decodeFun} σύμφωνα με το όρισμα \texttt{level} (τιμές 1, 2 ή 3).
+Έτσι, η συνάρτηση \texttt{demoAAC1} αρκεί να την καλέσει ως \mintinline{MATLAB}!SNR = genericDemo(fNameIn, fNameOut, 1)!.
+
+\begin{itemize}
+\item Η ακολουθία \texttt{input} διαβάζεται μέσω της συνάρτησης του MATLAB \mintinline{MATLAB}!audioread!.
+
+\item Η \texttt{output} υπολογίζεται μετά την αποκωδικοποίηση:
+\mintinline{MATLAB}!output = decodeFun(AACSeq, fNameOut)!.
+
+\item Το \texttt{SNR} υπολογίζεται ως:
+\begin{minted}{MATLAB}
+common_length = min(length(input), length(output));
+input = input(1:common_length,:);
+output = output(1:common_length,:);
+noise = input - output;
+
+SNR = snr(input, noise);
+\end{minted}
+\end{itemize}
+
+\subsection{Αποτελέσματα}\label{sub:results1}
+Παρατηρούμε γρήγορη εκτέλεση και signal to noise ratio ίσο με $307 dB$.
+Αυτό σημαίνει ότι οι μόνες απώλειες που έχουμε είναι λόγω της ακρίβειας των πράξεων του MATLAB.
+\begin{code}
+\begin{minted}{MATLAB}
+>> SNR = demoAAC1('input.wav', 'output.wav')
+Encoding:Elapsed time is 0.957438 seconds.
+Decoding:Elapsed time is 0.225739 seconds.
+Level 1: SNR for channel 1: 307.89.
+Level 1: SNR for channel 2: 307.942.
+
+SNR =
+
+  307.9169
+\end{minted}
+\caption{SNR για την υλοποίηση του πρώτου επιπέδου με παράθυρο \texttt{SIN}}
+\end{code}
