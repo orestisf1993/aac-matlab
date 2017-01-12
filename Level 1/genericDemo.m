@@ -1,4 +1,4 @@
-function [SNR, bitrate, compression] = genericDemo(fNameIn, fNameOut, level, fnameAACoded)
+function [SNR, bitrate, compression] = genericDemo(fNameIn, fNameOut, level, fnameAACoded, useDirOnCompressed)
 %GENERICDEMO Generic demo code for all 3 levels of the project.
 %   SNR = GENERICDEMO(FNAMEIN, FNAMEOUT, LEVEL) will encode audio file FNAMEIN with AAC of level
 %   LEVEL and save the output in FNAMEOUT. SNR is the signal to noise ratio.
@@ -47,13 +47,39 @@ SNR = snr(input, noise);
 fprintf('Level %d: SNR for channel 1: %g.\n', level, snr(input(:, 1), noise(:, 1)));
 fprintf('Level %d: SNR for channel 2: %g.\n', level, snr(input(:, 2), noise(:, 2)));
 if level >= 3
+    if ~exist('useDirOnCompressed', 'var')
+        useDirOnCompressed = false;
+    end
+
     bitsPerByte = 8;
     originalMetadata = dir(fNameIn);
     originalBytes = strcat(num2str(originalMetadata.bytes), ' bytes');
     originalBits = originalMetadata.bytes * bitsPerByte;
-    compressedMetadata = dir(fnameAACoded);
-    compressedSizeBytes = strcat(num2str(compressedMetadata.bytes), ' bytes');
-    compressedSizeBits = compressedMetadata.bytes * bitsPerByte;
+    if useDirOnCompressed
+        compressedMetadata = dir(fnameAACoded);
+        compressedSizeBytes = strcat(num2str(compressedMetadata.bytes), ' bytes');
+        compressedSizeBits = compressedMetadata.bytes * bitsPerByte;
+    else
+        compressedSizeBits = 0;
+        bytesPerDouble = 8;
+        bitsPerDouble = bytesPerDouble * bitsPerByte;
+        bytesPerInt = 4;
+        bitsPerInt = bytesPerInt * bitsPerByte;
+        for idx = 1:length(AACSeq)
+            compressedSizeBits = compressedSizeBits ...
+                +numel(AACSeq(idx).chl.sfc) ...
+                + numel(AACSeq(idx).chr.sfc) ...
+                + numel(AACSeq(idx).chl.stream) ...
+                + numel(AACSeq(idx).chr.stream) ...
+                + (numel(AACSeq(idx).chl.TNScoeffs) + 1) * bitsPerDouble ...
+                + (numel(AACSeq(idx).chr.TNScoeffs) + 1) * bitsPerDouble ...
+                + numel(AACSeq(idx).chl.codebook) * bitsPerInt ...
+                + numel(AACSeq(idx).chr.codebook) * bitsPerInt ...
+                + 2 + 1;
+        end
+        compressedSizeBytes = strcat(num2str(compressedSizeBits*bitsPerByte), ' bytes');
+    end
+
     compression = (compressedSizeBits / originalBits);
     compressionRatioTimes = originalBits / compressedSizeBits;
     bitrate = compressedSizeBits / (length(output) / fs);

@@ -2,8 +2,8 @@ function [bands, qsthr, bval] = initBands(frameType)
 %INITBANDS Returns the band ranges and the thresholds in quiet.
 %   BANDS = INITBANDS(FRAMETYPE) will store only the bands in BANDS according to
 %   frame type FRAMETYPE.
-%   [BANDS, QSTHR] = INITBANDS(FRAMETYPE) will also store the quiet thresholds
-%   in QSTHR.
+%   [BANDS, QSTHR, BVAL] = INITBANDS(FRAMETYPE) will also store the quiet thresholds
+%   in QSTHR and bvals in BVAL.
 
 isESH = strcmp(frameType, 'ESH');
 % Each array ends with the upper limit (w_high) of the last band.
