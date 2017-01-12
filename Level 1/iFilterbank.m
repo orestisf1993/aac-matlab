@@ -11,7 +11,6 @@ N = 2 * length(frameF); % frameT's length.
 assertIsFrameType(frameType);
 assertIsFullFrame(frameF, 'Different frame size expected', 1024);
 assert(N == 2048);
-assert(~exist('frameT', 'var'));
 
 %% Create needed windows.
 [shortWindow, longWindow] = createWindows(N, frameType, winType);
