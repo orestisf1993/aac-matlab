@@ -1,3 +1,174 @@
 \section{Level 3}
 \subsection{Υλοποίηση}
+\subsubsection{\texttt{psycho}}
+\begin{itemize}
+\item Η spreading function υπολογίζεται σε κάθε κλήση της \texttt{psycho} μέσω της υποσυνάρτησης \texttt{spreadingFunction()} για κάθε πιθανό συνδυασμό των τιμών index μπάντας:
+\begin{minted}{MATLAB}
+for b1 = bb
+    for b2 = bb
+        spreading(b1, b2) = spreadingFunction(b1, b2, bval);
+    end
+end
+\end{minted}
+
+\item Το παράθυρο Hann υπολογίζεται σύμφωνα με τον τύπο:
+\begin{minted}{MATLAB}
+hannWindow = 0.5 - 0.5 * cos(pi / N * ((0:N - 1) + 0.5));
+hannWindow = hannWindow(:);
+\end{minted}
+
+\item Η υποσυνάρτηση \texttt{frameFFT()} υπολογίζει των FFT ενός frame $2048 \times 1$ και υπολογίζει σε μορφή μέτρου και ορίσματος τα πρώτα $1024$ στοιχεία του στα \texttt{r} και \texttt{f}.
+
+\item Τα υπόλοιπα βήματα ακολουθούνται όπως αναγράφονται στην εκφώνηση με πράξεις διανυσμάτων ή με λούπες \mintinline{MATLAB}!for!.
+\end{itemize}
+
+\subsubsection{\texttt{AACquantizer} και \texttt{iAACquantizer}}
+\begin{itemize}
+\item Η ενέργεια των συντελεστών MDCT, τόσο για τον υπολογισμό των \texttt{T} όσο και για τον υπολογισμό της ενέργειας σφάλματος κβαντισμού, υπολογίζεται μέσω της υποσυνάρτησης \texttt{bandEnergy()}.
+
+\item Για τον υπολογισμό των \texttt{a}, αφού αρχικοποιηθούν στη τιμή \mintinline{MATLAB}!floor(16/3*log2(max(frame)^(3 / 4)/MQ))!, χρησιμοποιείται η επανάληψη:
+\begin{minted}{MATLAB}
+while true
+    a = aNew;
+    P = quantizationError(frame, a, bands);
+    aNew = a + (P < T);
+    if all(aNew == a) || max(abs(diff(aNew))) > 60
+        break
+    end
+end
+\end{minted}
+Η επανάληψη "σπάει" όταν όλες οι νέες τιμές \texttt{aNew} είναι ίσες με τις παλιές τιμές \texttt{a} ή όταν φτάσουμε τη μέγιστη διαφορά μεταξύ δύο στοιχείων του \texttt{a}.
+
+\item Η υποσυνάρτηση \texttt{quantizationError()} καλεί την υποσυνάρτηση \texttt{quantize()} πάνω στο frame και τη συνάρτηση \texttt{deQuantize()} πάνω στο αποτέλεσμα της προηγούμενης:
+\begin{minted}{MATLAB}
+a = bandStretch(a, size(X), bands);
+S = quantize(X, a);
+Xbar = deQuantize(S, a);
+P = bandEnergy(X-Xbar, bands);
+\end{minted}
+
+\item Η \texttt{bandStretch} χρησιμοποιείται για την μετατροπή ενός διανύσματος μεγέθους $N_B \times 1$ σε $1024 \times 1$.
+
+\item Οι διαφορές των συντελεστών υπολογίζονται μέσω της συνάρτησης του MATLAB \mintinline{MATLAB}!diff! ενώ η αντίστροφη διαδικασία στην \texttt{iAACquantizer()} γίνεται μέσω της συνάρτησης του MATLAB \mintinline{MATLAB}!cumsum!.
+\end{itemize}
+
+\subsubsection{\texttt{AACoder3} και \texttt{iAACoder3}}
+Σε σχέση με τα προηγούμενα επίπεδα πραγματοποιήθηκαν οι εξής αλλαγές:
+\begin{itemize}
+\item Αρχικοποιούνται 2 μηδενικά frames \texttt{frameTprev1} και \texttt{frameTprev2} για τη χρήση στη \texttt{psycho()}.
+Αυτά, στη συνέχεια, κρατάνε τις τιμές των προηγούμενων frame.
+
+\item Για κάθε κανάλι ξεχωριστά καλείται η \texttt{psycho} στο \texttt{frameT}, η \texttt{AACquantizer} και οι \texttt{encodeHuff} και \texttt{decodeHuff} (που μας δίνονται).
+Τα ορίσματα στην \texttt{encodeHuff} περνιούνται σαν μονοδιάστατα διανύσματα ενώ τα αποτελέσματα της \texttt{decodeHuff} μετατρέπονται στο κατάλληλο μέγεθος σύμφωνα με το \texttt{frameType}.
+
+\item Αν δοθεί το όρισμα \texttt{fnameAACoded} αποθηκεύεται το \mintinline{MATLAB}!struct AACSeq3!.
+
+\item Η ακολουθία \texttt{decoded} στη \texttt{iAACoder3} κανονικοποιείται ως:
+\begin{minted}{MATLAB}
+decoded(:, 1) = decoded(:, 1) ./ max(abs(decoded(:, 1)));
+decoded(:, 2) = decoded(:, 2) ./ max(abs(decoded(:, 2)));
+\end{minted}
+καθώς η \mintinline{MATLAB}!audiowrite! αποθηκεύει δεδομένα που βρίσκονται μεταξύ των τιμών \texttt{0} και \texttt{1}.
+\end{itemize}
+
+\subsubsection{\texttt{demoAAC3}}
+Η συνάρτηση \texttt{demoAAC3} αρκεί να καλέσει την \hyperref[genericDemo]{\texttt{genericDemo}}
+ως \mintinline{MATLAB}![SNR, bitrate, compression] = genericDemo(fNameIn, fNameOut, 3, fnameAACoded)!.
+
+Το μέγεθος του αρχικού αρχείου ήχου υπολογίζεται μέσω της εντολής \mintinline{MATLAB}!dir! του MATLAB από το αρχείο \texttt{fNameIn}.
+
+Για το μέγεθος του συμπιεσμένου αποτελέσματος έγινε η εξής παρατήρηση:
+Σύμφωνα με το documentation του MATLAB η εντολή \mintinline{MATLAB}!save! έκδοσης \texttt{7} και μεγαλύτερης πραγματοποιεί αυτόματη συμπίεση των δεδομένων.
+Επίσης, ενώ τα αποτελέσματα της \texttt{encodeHuff} είναι μια σειρά δυαδικών αριθμών, το MATLAB αποθηκεύει μη αποδοτικά τα δεδομένα, σαν σειρά από \mintinline{MATLAB}!char!.
+Για αυτό, το "πραγμάτικο" μέγεθος των συμπιεσμένων δεδομένων γίνεται να υπολογιστεί είτε μέσω της εντολής \mintinline{MATLAB}!dir! από το αρχείο \texttt{fnameAACoded} ή με εναλλακτικό τρόπο.
+Η επιλογή της μεθόδου μέτρησης γίνεται με το flag \texttt{useDirOnCompressed}.
+
+Ο εναλλακτικός τρόπος είναι ο εξής:
+\begin{minted}{MATLAB}
+for idx = 1:length(AACSeq)
+    compressedSizeBits = compressedSizeBits ...
+        + numel(AACSeq(idx).chl.sfc) ...
+        + numel(AACSeq(idx).chr.sfc) ...
+        + numel(AACSeq(idx).chl.stream) ...
+        + numel(AACSeq(idx).chr.stream) ...
+        + (numel(AACSeq(idx).chl.TNScoeffs) + 1) * bitsPerDouble ...
+        + (numel(AACSeq(idx).chr.TNScoeffs) + 1) * bitsPerDouble ...
+        + numel(AACSeq(idx).chl.codebook) * bitsPerInt ...
+        + numel(AACSeq(idx).chr.codebook) * bitsPerInt ...
+        + 2 + 1;
+end
+\end{minted}
+Για κάθε μέλος του \mintinline{MATLAB}!struct AACSeq!:
+\begin{itemize}
+\item Μετράμε το κάθε ψηφίο των ακολουθιών \texttt{sfc} από κάθε channel ως 1 bit.
+\item Μετράμε το κάθε ψηφίο των ακολουθιών \texttt{stream} από κάθε channel ως 1 bit.
+\item Μετράμε το κάθε στοιχείο των πινάκων \texttt{TNScoeffs} από κάθε channel έως 64 bit σαν double precision floating point.
+\item Προσθέτουμε το μέγεθος 2 integers για τα \texttt{codebook}, 2 bits για την αποθήκευση του \texttt{frameType} και 1 bit για το \texttt{winType}.
+\end{itemize}
+Φυσικά, αυτή η μέτρηση είναι πρόχειρη και το πραγματικό μέγεθος σε πραγματική εφαρμογή μπορεί να ήταν διαφορετικό.
+
+Θεωρούνται $8$ bits ανά byte και $1000$ bytes ανά kilobyte.
+
 \subsection{Αποτελέσματα}
+Φυσικά, λόγω της κωδικοποίησης και της απώλειας πληροφορίας, το signal to noise ratio έπεσε σημαντικά.
+Ωστόσο, στο αυτί το τραγούδι δεν φαίνεται να έχει μεγάλη απώλειας.
+
+\begin{code}
+\begin{minted}{MATLAB}
+>> [SNR, bitrate, compression] = demoAAC3('input.wav', 'output.wav', 'level3.mat')
+Encoding:Saving encoding in file level3.mat.
+Elapsed time is 122.143561 seconds.
+Decoding:Elapsed time is 3.155757 seconds.
+Level 3: SNR for channel 1: 5.79205.
+Level 3: SNR for channel 2: 5.91146.
+Uncompressed audio: 1131956 bytes (9055648 bits).
+Compressed struct : 244628 bytes (1957024 bits).
+Compression ratio : 21.611087% (x 4.627254).
+Bitrate: 333.583636 kbits per second.
+
+SNR =
+
+    5.8533
+
+
+bitrate =
+
+   3.3358e+05
+
+
+compression =
+
+    0.2161
+\end{minted}
+\caption{SNR για την υλοποίηση του τρίτου επιπέδου με παράθυρο \texttt{SIN} και με μετρήσεις με την εντολή \texttt{dir}}
+\end{code}
+
+\begin{code}
+\begin{minted}{MATLAB}
+>> [SNR, bitrate, compression] = demoAAC3('input.wav', 'output.wav', 'level3.mat')
+Encoding:Saving encoding in file level3.mat.
+Elapsed time is 121.206160 seconds.
+Decoding:Elapsed time is 3.083816 seconds.
+Level 3: SNR for channel 1: 5.79205.
+Level 3: SNR for channel 2: 5.91146.
+Uncompressed audio: 1131956 bytes (9055648 bits).
+Compressed struct : 11044832 bytes (1380604 bits).
+Compression ratio : 15.245778% (x 6.559193).
+Bitrate: 235.330227 kbits per second.
+
+SNR =
+
+    5.8533
+
+
+bitrate =
+
+   2.3533e+05
+
+
+compression =
+
+    0.1525
+\end{minted}
+\caption{SNR για την υλοποίηση του τρίτου επιπέδου με παράθυρο \texttt{SIN} και με τον εναλλακτικό τρόπο μέτρησης μεγέθους}
+\end{code}
